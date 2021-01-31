@@ -1,0 +1,84 @@
+{% extends "basic_layout.html" %}
+{% load static %}
+{% block content %}
+<script src="https://cdn.tiny.cloud/1/glkkmvfr6amtkidkd2qdb4pmrkf9wlomwmsaegunkc8az915/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+
+var useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+tinymce.init({
+  selector: 'textarea#id_content',
+  setup: function (editor) {
+        editor.on('change', function () {
+            editor.save();
+        });
+    },
+  plugins: 'print visualblocks checklist preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+  imagetools_cors_hosts: ['picsum.photos'],
+  menubar: 'file edit view insert format tools table help',
+  toolbar: 'undo redo | bold italic underline strikethrough superscript subscript | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+  toolbar_sticky: true,
+  autosave_ask_before_unload: true,
+  autosave_interval: '30s',
+  autosave_prefix: '{path}{query}-{id}-',
+  autosave_restore_when_empty: false,
+  autosave_retention: '2m',
+  image_advtab: true,
+  importcss_append: true,
+  height: 600,
+  menu: {
+    format: {
+      title: 'Format',
+      items: 'bold italic underline strikethrough superscript subscript codeformat | checklist | formats blockformats fontformats fontsizes align | forecolor backcolor | removeformat'
+    }
+  },
+  image_caption: true,
+  quickbars_insert_toolbar: 'quickimage quicktable media link',
+  quickbars_selection_toolbar: 'bold italic underline | quicklink h1 h2 h3 blockquote quickimage quicktable',
+  noneditable_noneditable_class: 'mceNonEditable',
+  toolbar_mode: 'sliding',
+  contextmenu: 'link image imagetools table',
+  skin: useDarkMode ? 'oxide-dark' : 'oxide',
+  content_css: useDarkMode ? 'dark' : 'default',
+  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+  style_formats: [
+    { title: 'Headers', items: [
+      { title: 'h1', block: 'h1' },
+      { title: 'h2', block: 'h2' },
+      { title: 'h3', block: 'h3' },
+      { title: 'h4', block: 'h4' },
+      { title: 'h5', block: 'h5' },
+      { title: 'h6', block: 'h6' }
+    ] },
+
+    { title: 'Blocks', items: [
+      { title: 'p', block: 'p' },
+      { title: 'div', block: 'div' },
+      { title: 'pre', block: 'pre' },
+    ] },
+
+    { title: 'Containers', items: [
+      { title: 'section', block: 'section', wrapper: true, merge_siblings: false },
+      { title: 'article', block: 'article', wrapper: true, merge_siblings: false },
+      { title: 'blockquote', block: 'blockquote', wrapper: true },
+      { title: 'hgroup', block: 'hgroup', wrapper: true },
+      { title: 'aside', block: 'aside', wrapper: true },
+      { title: 'figure', block: 'figure', wrapper: true }
+    ] }
+  ],
+ });
+    </script>
+
+    <div class="main-cntent"></div><br />
+    <img src="{% static 'images/logo_b.png' %}" alt="thePythoneer.tech" class="float-right" style="max-width : 70%;margin-left : -5%"/>
+    <form action="" method="post" enctype="multipart/form-data">
+    <legend>Enter Data For New Blog Entry </legend>
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% comment %} <input type="text" name="title" id="title" ></input> {% endcomment %}
+            <input type="submit" name="submitbtn" class="btn btn-primary btn-block" />
+    {% comment %} <button name="submitbtn">Submit</button> {% endcomment %}
+    <br /><br />
+    </form>
+    <script src="/static/js/form_style.js"></script>
+{% endblock %}

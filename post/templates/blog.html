@@ -1,0 +1,301 @@
+{% extends "basic_layout.html" %}
+{% load static %}
+{% block content %}
+    <br/>
+    <style>
+        #blogcontents {
+            text-align: justify;
+  text-justify: inter-word;
+        }
+        .tag {
+            display: inline-block;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        .emoji {
+            transition: transform .2s;
+            margin-bottom: 0.7em;
+        }
+        .emoji:hover {
+            transform: scale(1.3);
+        }
+        .screen {
+            background-color: ;
+        }
+        #toc_container a {
+            color: #000;
+        }
+        #toc_container {
+            z-index: -1;
+            display: block;
+            background-color: #f8f8f8;
+            border-radius: 0.5em;
+            padding: 1.2em;
+            color: #000;
+            border: 2px solid black;
+        }
+        #toc_container_sidebar a {
+            color: #000;
+        }
+        .title{
+            text-align: -webkit-left
+        }
+        #toc_container_sidebar {
+            display: block;
+            background-color: #f8f8f8;
+            border-radius: 0.5em;
+            padding: 1.2em;
+            color: #000;
+            border: 2px solid black;
+        }
+        .instagram {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position : relative;
+  right: 0px;
+  text-align: center;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 45px;
+  line-height: 45px;
+  vertical-align: middle;
+  background: #d6249f;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+  box-shadow: 0px 3px 10px rgba(0,0,0,.25);
+}
+    </style>
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v9.0" nonce="7aeEJUUf"></script>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-12 text-left">
+            <div id="blogcontents">
+            
+                <img style="max-width: -webkit-fill-available; margin-bottom: 10px" class="rounded" src="/images/{{ post.image }}" />
+                <b><h2 id="post_title">{{ post.title }}</h2></b>
+                <p style="color: #555"><b><i class="fas fa-user-edit"></i>
+                    by {{ post.author }}
+                    &emsp; <i class="fas fa-clock"></i> {{ post.date }}
+                    &emsp; <i class="fas fa-tags"></i>
+                        {% for i in tags %}
+                            <span style="background-color: #eee;border-radius: 2px; padding : 2 px 8px;">{{ i }}</span>
+                        {% endfor %}
+                </b></p>
+            
+                <!-- LINKS -->
+                <div class="links">
+                    <a href="https://api.whatsapp.com/send?text={{ post.whatsapp_message }}"><div class="btn btn-xs btn-success m-1"><i class="fab fa-whatsapp"></i> Whatsapp</div></a>
+                    <div class="fb-share-button btn btn-xs btn-primary  m-1" data-href="{{ post.facebook_link }}" data-layout="button" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
+                    
+                    <script>
+                        window.onload = function(){
+                            var url = window.location.href;
+                            document.getElementById('email_link').href = document.getElementById('email_link').href + " " + window.location.href + "";
+                        };
+                    </script>
+                    <a id="email_link" href="mailto:?subject=I wanted you to see this site&amp;body=Check out this tutorial post " class=" m-1" title="Share by Email">
+                        <div class="btn btn-xs btn-danger"><i class="fas fa-envelope"></i> E-mail</div>
+                    </a>
+                    {% comment %} <a href="https://t.me/share/url?" id="telegram_link"><div class="btn btn-xm btn-primary"><i class="fab fa-telegram-plane"></i> Telegram</div> </a> {% endcomment %}
+                </div>
+            
+                <div id="toc_container" style="margin-top: 2em;">
+                    <div class="toc" ></div>
+                </div>
+                    {% autoescape off %}
+                        <div style="margin: 2em 0px"><p> {{ post.content }} </p></div>
+                    {% endautoescape %}
+            </div>
+            <div class="row card m-4 p-1" style:"background-color: #f8f8ff">
+                <div class="container">
+                    <p style="font-size: 2rem" class="text-center">Leave your Feedback</p>
+                    <div class="row text-center" style="font-size: 4rem;">
+                        <div class="col-4 emoji">
+                            👍<span style="visibility: hidden;position: absolute">id_feedback_upvote</span>
+                        </div>
+                        <div class="col-4 emoji">
+                            🤩<span style="visibility: hidden;position: absolute">id_feedback_loved</span>
+                        </div>
+                        <div class="col-4 emoji">
+                            😮<span style="visibility: hidden;position: absolute">id_feedback_amazed</span>
+                        </div>
+                    </div>
+                    <form action="" method="post" id="post_feedback">
+                        {% csrf_token %} 
+                        <input type="hidden" name="feedback_upvote" value="{{ post.feedback_upvote }}" required="" id="id_feedback_upvote">
+                        <input type="hidden" name="feedback_loved" value="{{ post.feedback_loved }}" required="" id="id_feedback_loved">
+                        <input type="hidden" name="feedback_amazed" value="{{ post.feedback_amazed }}" required="" id="id_feedback_amazed">
+                        {% comment %} {{ feedback_form.as_p }} {% endcomment %}
+                        {% comment %} <button class="btn btn-primary" name="Submit" type"submit" placeholder="Submit">Submit</button> {% endcomment %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <aside class="col-lg-4 col-md-8">
+            <div class="card mb-4" style="background-color: #d0d0ff; border: 2px solid black">
+                <div class="card-body">
+                    <h4 style="text-align: center;color: #888"> -- FREE Email Series -- </h4>
+                    <h4 style="text-align: center;color: #111; font-size: 1.5rem">🐍 Python Tips & Tricks 💌</h4>
+                    <img src="/images/swap.png" style="width: 100%"/>
+                    <br /><br />
+                    <form class="form-group ">
+                        <input type="email" name="Email" value="" placeholder="Email" class="form-control" ></input>
+                        <button type="submit" class="btn btn-danger btn-lg btn-block mt-3">Subscribe Now . . .</button>
+                    </form>
+                    {% comment %} <h6 class="card-title" style="text-align: center;color: #777">🐍 Boost Your Python Skills with weekly newsletter 💌 </h5> {% endcomment %}
+                    <h6 class="card-title" style="text-align: center;color: #777">❤️ Loved by all Pythoneers ❤️</h5>
+                    <h6 class="card-title" style="text-align: center;color: #777">🔒 No spam of any kind of emails </h5>
+                </div>
+            </div>
+            {% comment %} <div class="card">
+                <img src="/images/insta.png" style="width: 200px;height: 60px"/>
+                <div class="instagram">
+                    <i class="fab fa-instagram"></i>
+                </div>
+            </div> {% endcomment %}
+            <div class="sticky-top" style="top: 4em">
+                <div id="sidebarcontents">
+                    <div id="toc_container_sidebar">
+                </div>
+            </div>
+            <!-- Links -->
+            <div class="links" style="margin-top: 1em">
+                    <a href="https://api.whatsapp.com/send?text={{ post.whatsapp_message }}"><div class="btn btn-xs btn-success  m-1"><i class="fab fa-whatsapp"></i> Whatsapp</div></a>
+                    <div class="fb-share-button btn btn-xs btn-primary  m-1" data-href="{{ post.facebook_link }}" data-layout="button" data-size="large"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
+                    <script>
+                        window.onload = function(){
+                            var url = window.location.href;
+                            document.getElementById('email_link').href = document.getElementById('email_link').href + " " + window.location.href + "";
+                        };
+                    </script>
+                    <a id="email_link" href="mailto:?subject=I wanted you to see this site&amp;body=Check out this tutorial post "title="Share by Email">
+                        <div class="btn btn-xs btn-danger m-1"><i class="fas fa-envelope"></i> E-mail</div>
+                    </a>
+                    {% comment %} <a href="https://t.me/share/url?" id="telegram_link"><div class="btn btn-xm btn-primary"><i class="fab fa-telegram-plane"></i> Telegram</div> </a> {% endcomment %}
+            </div>
+            <div class="">
+                <div class="row card m-1 p-1" style:"background-color: #f8f8ff">
+                    <p style="font-size: 1.3rem" class="text-center">Leave your Feedback</p>
+                    <div class="row text-center" style="font-size: 2.2rem;">
+                        <div class="col-4 emoji" style="margin-bottom: 0px" style="margin-bottom: 0px">
+                            👍<span style="visibility: hidden;position: absolute">id_feedback_upvote</span>
+                        </div>
+                        <div class="col-4 emoji" style="margin-bottom: 0px">
+                            🤩<span style="visibility: hidden;position: absolute">id_feedback_loved</span>
+                        </div>
+                        <div class="col-4 emoji" style="margin-bottom: 0px">
+                            😮<span style="visibility: hidden;position: absolute">id_feedback_amazed</span>
+                        </div>
+                    </div>
+                    <form action="" method="post" id="post_feedback">
+                        {% csrf_token %} 
+                        <input type="hidden" name="feedback_upvote" value="{{ post.feedback_upvote }}" required="" id="id_feedback_upvote">
+                        <input type="hidden" name="feedback_loved" value="{{ post.feedback_loved }}" required="" id="id_feedback_loved">
+                        <input type="hidden" name="feedback_amazed" value="{{ post.feedback_amazed }}" required="" id="id_feedback_amazed">
+                        {% comment %} {{ feedback_form.as_p }} {% endcomment %}
+                        {% comment %} <button class="btn btn-primary" name="Submit" type"submit" placeholder="Submit">Submit</button> {% endcomment %}
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <script>
+for (var i = 0; i < 6;i++){
+document.getElementsByClassName("emoji")[i].addEventListener("click", function() {
+    $("#" + this.children[0].innerHTML)[0].value = 1;
+    var data = {
+        'feedback_upvote': 0,
+        'feedback_loved': 0,
+        'feedback_amazed': 0
+    }
+    data[this.children[0].innerHTML.slice(3)] = 1;
+    var string = JSON.stringify(data);
+    var res = {}
+    if (localStorage.getItem(document.getElementById("post_title").innerHTML)){
+        res['feedback_amazed'] = data['feedback_amazed'] - JSON.parse(localStorage.getItem(document.getElementById("post_title").innerHTML))['feedback_amazed'];
+        res['feedback_loved'] = data['feedback_loved'] - JSON.parse(localStorage.getItem(document.getElementById("post_title").innerHTML))['feedback_loved'];
+        res['feedback_upvote'] = data['feedback_upvote'] - JSON.parse(localStorage.getItem(document.getElementById("post_title").innerHTML))['feedback_upvote'];
+        data = res;
+    }
+    data[document.getElementsByName('csrfmiddlewaretoken')[0].name] = document.getElementsByName('csrfmiddlewaretoken')[0].value
+    $.ajax({url: "/b/" + document.getElementById("post_title").innerHTML,data: data,type: 'POST', success: function(result){
+        localStorage.setItem(document.getElementById("post_title").innerHTML, string);
+        $("#id_feedback_amazed")[0].value = result['feedback_amazed'];
+        $("#id_feedback_loved")[0].value = result['feedback_loved'];
+        $("#id_feedback_upvote")[0].value = result['feedback_upvote'];
+        $('.emoji')[0].innerHTML = $('.emoji')[0].innerHTML.slice(0,31) + "<span style='visibility:hidden; position: absolute'>" + document.getElementsByClassName('emoji')[0].firstElementChild.innerHTML + "</span><br /><center><div class='card' style='font-size: 1.5rem;width: 2rem;'> " + result['feedback_upvote'] + "</div></center>";
+        $('.emoji')[1].innerHTML = $('.emoji')[1].innerHTML.slice(0,31) + "<span style='visibility:hidden; position: absolute'>" + document.getElementsByClassName('emoji')[1].firstElementChild.innerHTML + "</span><br /><center><div class='card' style='font-size: 1.5rem;width: 2rem;'> " + result['feedback_loved'] + "</div></center>";
+        $('.emoji')[2].innerHTML = $('.emoji')[2].innerHTML.slice(0,31) + "<span style='visibility:hidden; position: absolute'>" + document.getElementsByClassName('emoji')[2].firstElementChild.innerHTML + "</span><br /><center><div class='card' style='font-size: 1.5rem;width: 2rem;'> " + result['feedback_amazed'] + "</div></center>";
+        $('.emoji')[3].innerHTML = $('.emoji')[0].innerHTML.slice(0,31) + "<span style='visibility:hidden; position: absolute'>" + document.getElementsByClassName('emoji')[0].firstElementChild.innerHTML + "</span><br /><center><div class='card' style='font-size: 1.5rem;width: 2rem;'> " + result['feedback_upvote'] + "</div></center>";
+        $('.emoji')[4].innerHTML = $('.emoji')[1].innerHTML.slice(0,31) + "<span style='visibility:hidden; position: absolute'>" + document.getElementsByClassName('emoji')[1].firstElementChild.innerHTML + "</span><br /><center><div class='card' style='font-size: 1.5rem;width: 2rem;'> " + result['feedback_loved'] + "</div></center>";
+        $('.emoji')[5].innerHTML = $('.emoji')[2].innerHTML.slice(0,31) + "<span style='visibility:hidden; position: absolute'>" + document.getElementsByClassName('emoji')[2].firstElementChild.innerHTML + "</span><br /><center><div class='card' style='font-size: 1.5rem;width: 2rem;'> " + result['feedback_amazed'] + "</div></center>";
+    }});
+    //document.getElementById("post_feedback").submit();
+});
+}
+// BLOG CONTENTS TOC
+        if ($('#blogcontents h1').length > 0) {
+        $('#toc_container').prepend('<nav class="toc"><h3 class="title">Table of Contents</h3><ul></ul></nav>');
+        }
+        
+        $('#blogcontents').find('h1 a').each(function() {
+          var $item = $(this);
+          var $id = $(this).attr('id');
+          var $text = "";
+          var res = $id.split("_");
+          var i = 0;
+          for (i = 0; i < res.length; i++){
+              $text = $text + " " + res[i];
+          }
+
+          var li = $('<li/>');
+          var a = $('<a/>', {text: $text, href: '#' + $id, title: $item.text()});
+          a.appendTo(li);
+          $('#blogcontents .toc ul').append(li);
+        });
+
+// SIDEBAR CONTENTS TOC
+        if ($('#blogcontents h1').length > 0) {
+        $('#toc_container_sidebar').prepend('<nav class="toc"><h3 class="title">Table of Contents</h3><ul></ul></nav>');
+        }
+        $('#blogcontents').find('h1 a').each(function() {
+          var $item = $(this);
+          var $id = $(this).attr('id');
+          var $text = "";
+          var res = $id.split("_");
+          var i = 0;
+          for (i = 0; i < res.length; i++){
+              $text = $text + " " + res[i];
+          }
+          var li = $('<li/>');
+          var a = $('<a/>', {text: $text, href: '#' + $id, title: $item.text()});
+          a.appendTo(li);
+          $('#sidebarcontents .toc ul').append(li);
+        });
+
+// ON SCROLL
+        $(function() {    
+            $(window).scroll(function() {
+                    $("#blogcontents h1 a").each(function() {
+                    if($(window).scrollTop() >= $(this).offset().top) {
+                        var id = $(this).attr('id');
+                        $('li a').removeClass('btn-warning');
+                        $('li a[href="#'+ id +'"]').addClass('btn-warning');
+                    }
+                });
+            });
+         });
+
+// IMAGE MAX WIDTH
+         $('body #blogcontents p img').each(function () {
+            $(this).width("100%");
+         })
+        </script>
+{% endblock content %}

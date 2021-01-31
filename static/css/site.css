@@ -1,0 +1,7 @@
+.sidebar-sticky{
+    position: fixed;
+    position: -webkit-sticky;
+}
+.sidebar-nav-message{
+    top: 15rem!important;
+}
